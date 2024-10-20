@@ -1,10 +1,10 @@
 const { Router } = require("express");
 const adminRouter = Router();
 const jwt = require("jsonwebtoken");
-const JWT_ADMIN_PASSWORD = "adminSecret";
+const { JWT_ADMIN_PASSWORD } = require("../config");
 const { z } = require("zod");
 const bcrypt = require("bcrypt");
-const { adminModel } = require("../db");
+const { adminModel, courseModel } = require("../db");
 
 adminRouter.post("/signup", async function (req, res) {
   const requiredBody = z.object({
@@ -66,9 +66,22 @@ adminRouter.post("/signin", async function (req, res) {
     });
   }
 });
-adminRouter.get("/purchases", function (req, res) {
+adminRouter.get("/course", async function (req, res) {
+    const adminId = req.adminId;
+
+    const { title, descreption, imageUrl, price } = req.body;
+
+    const course = await courseModel.create({
+        title : title,
+        descreption : descreption,
+        imageUrl : imageUrl,
+        price : price, 
+        creatorId : adminId
+    });
+
   res.json({
-    message: "Your Purchases...",
+    message: "Course created",
+    courseId : course._id
   });
 });
 adminRouter.get("/purchases", function (req, res) {
@@ -77,7 +90,7 @@ adminRouter.get("/purchases", function (req, res) {
   });
 });
 
-adminRouter.get("/admin", function () {
+adminRouter.get("/course/bulk", function () {
   res.json({
     message: "You are at Admin...",
   });

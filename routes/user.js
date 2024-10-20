@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const userRouter = Router();
 const { z } = require("zod");
 const jwt = require("jsonwebtoken");
-const JWT_USER_PASSWORD = "coursesellingapp";
+const { JWT_USER_PASSWORD } = require("../config");
 const { userModel, purchaseModel, courseModel } = require("../db");
 
     
