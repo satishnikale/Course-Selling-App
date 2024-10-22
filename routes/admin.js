@@ -5,6 +5,7 @@ const { JWT_ADMIN_PASSWORD } = require("../config");
 const { z } = require("zod");
 const bcrypt = require("bcrypt");
 const { adminModel, courseModel } = require("../db");
+const { adminMiddleware } = require("../middlewares/adminAuth");
 
 adminRouter.post("/signup", async function (req, res) {
   const requiredBody = z.object({
@@ -45,7 +46,7 @@ adminRouter.post("/signin", async function (req, res) {
   const { email, password } = req.body;
 
   const admin = await adminModel.findOne({
-    email: email,
+    email: email
   });
 
   const match = await bcrypt.compare(password, admin.password);
@@ -66,7 +67,7 @@ adminRouter.post("/signin", async function (req, res) {
     });
   }
 });
-adminRouter.get("/course", async function (req, res) {
+adminRouter.post("/course", adminMiddleware, async function (req, res) {
     const adminId = req.adminId;
 
     const { title, descreption, imageUrl, price } = req.body;
@@ -84,16 +85,39 @@ adminRouter.get("/course", async function (req, res) {
     courseId : course._id
   });
 });
-adminRouter.get("/purchases", function (req, res) {
+
+adminRouter.put("/updatecourse", adminMiddleware, async function (req, res) {
+  const adminId = req.adminId;
+
+  const { title, description, imageUrl, price, courseId } = req.body;
+
+  const course = await courseModel.updateOne({
+      _id: courseId, 
+      creatorId: adminId 
+  }, {
+      title: title, 
+      description: description, 
+      imageUrl: imageUrl, 
+      price: price
+  })
+
   res.json({
-    message: "Your Purchases...",
-  });
+      message: "Course updated",
+      courseId: course._id
+  })
 });
 
-adminRouter.get("/course/bulk", function () {
-  res.json({
-    message: "You are at Admin...",
-  });
+adminRouter.get("/course/bulk", adminMiddleware, async function () {
+   const adminId = req.userId;
+
+    const courses = await courseModel.find({
+        creatorId: adminId 
+    });
+
+    res.json({
+        message: "Course updated",
+        courses
+    })
 });
 
 module.exports = { adminRouter };
