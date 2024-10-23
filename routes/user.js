@@ -5,6 +5,7 @@ const { z } = require("zod");
 const jwt = require("jsonwebtoken");
 const { JWT_USER_PASSWORD } = require("../config");
 const { userModel, purchaseModel, courseModel } = require("../db");
+const { userMiddleware } = require("../middlewares/userAuth")
 
     
     userRouter.post("/signup", async function(req, res){
@@ -65,11 +66,18 @@ const { userModel, purchaseModel, courseModel } = require("../db");
         }
         
     });
-    userRouter.get("/purchases", function(req, res){
+
+    userRouter.get("/purchases", userMiddleware, async function(req, res){
+        const userId = req.userId;
+
+        const purchases = await purchaseModel.find({
+            userId
+        });
+
         res.json({
-            message : "Your Purchases..."
+            purchases
         })
-    });
+});
     
  module.exports = {
     userRouter : userRouter
