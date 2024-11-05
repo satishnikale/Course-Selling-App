@@ -4,7 +4,7 @@ const userRouter = Router();
 const { z } = require("zod");
 const jwt = require("jsonwebtoken");
 const { JWT_USER_PASSWORD } = require("../config");
-const { userModel, purchaseModel, courseModel } = require("../db");
+const { userModel, purchaseModel } = require("../db");
 const { userMiddleware } = require("../middlewares/userAuth")
 
     
