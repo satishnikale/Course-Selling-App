@@ -69,14 +69,13 @@ const { userMiddleware } = require("../middlewares/userAuth")
 
     userRouter.get("/purchases", userMiddleware, async function(req, res){
         const userId = req.userId;
-
         const purchases = await purchaseModel.find({
             userId
         });
-
         res.json({
             purchases
         })
+        
 });
     
  module.exports = {
